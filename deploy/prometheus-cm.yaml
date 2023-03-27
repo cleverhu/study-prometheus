@@ -22,8 +22,8 @@ data:
       evaluation_interval: 15s
       scrape_timeout: 10s
 
-    # remote_write:    # 远程写入到远程 VM 存储
-    # - url: http://victoria-metrics:8428/api/v1/write
+    remote_write:    # 远程写入到远程 VM 存储
+    - url: http://vminsert:8480/insert/0/prometheus
 
     # alerting:
     #   alertmanagers:
