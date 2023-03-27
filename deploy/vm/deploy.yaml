@@ -13,10 +13,14 @@ spec:
       labels:
         app: victoria-metrics
     spec:
+      serviceAccountName: prometheus
       volumes:
         - name: storage
           persistentVolumeClaim:
             claimName: victoria-metrics-data
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
       containers:
         - name: vm
           image: victoriametrics/victoria-metrics:v1.76.1
@@ -24,34 +28,13 @@ spec:
           args:
             - -storageDataPath=/var/lib/victoria-metrics-data
             - -retentionPeriod=1w
+            - -promscrape.config=/etc/prometheus/prometheus.yml
+            - -promscrape.config.strictParse=false
           ports:
             - containerPort: 8428
               name: http
           volumeMounts:
             - mountPath: /var/lib/victoria-metrics-data
               name: storage
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: victoria-metrics
-  namespace: monitor
-spec:
-  type: NodePort
-  ports:
-    - port: 8428
-  selector:
-    app: victoria-metrics
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: victoria-metrics-data
-  namespace: monitor
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-  storageClassName: nfs-storage
+            - mountPath: /etc/prometheus
+              name: prometheus-config
