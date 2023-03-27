@@ -19,7 +19,7 @@ data:
     # 所有报警信息进入后的根路由，用来设置报警的分发策略
     route:
       # 这里的标签列表是接收到报警信息后的重新分组标签，例如，接收到的报警信息里面有许多具有 cluster=A 和 alertname=LatncyHigh 这样的标签的报警信息将会批量被聚合到一个分组里面
-      group_by: ['alertname', 'cluster']
+      group_by: ['severity', 'source']
       # 当一个新的报警分组被创建后，需要等待至少 group_wait 时间来初始化通知，这种方式可以确保您能有足够的时间为同一分组来获取多个警报，然后一起触发这个报警信息。
       group_wait: 30s
 
@@ -36,7 +36,7 @@ data:
       routes:
       - receiver: email
         group_wait: 10s
-        group_by: ['instance'] # 根据instance做分组
+        group_by: ['source'] # 根据instance做分组
         match:
           team: node
     receivers:

@@ -1,0 +1,53 @@
+# vmalert.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmalert
+  namespace: monitor
+  labels:
+    app: vmalert
+spec:
+  ports:
+    - name: vmalert
+      port: 8080
+      targetPort: 8080
+      nodePort: 30880
+  type: NodePort
+  selector:
+    app: vmalert
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmalert
+  namespace: monitor
+  labels:
+    app: vmalert
+spec:
+  selector:
+    matchLabels:
+      app: vmalert
+  template:
+    metadata:
+      labels:
+        app: vmalert
+    spec:
+      containers:
+        - name: vmalert
+          image: docker.m.daocloud.io/victoriametrics/vmalert:v1.77.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - -rule=/etc/ruler/*.yaml
+            - -datasource.url=http://vmselect.monitor.svc.cluster.local:8481/select/0/prometheus
+            - -notifier.url=http://alertmanager.monitor.svc.cluster.local:9093
+            - -remoteWrite.url=http://vminsert.monitor.svc.cluster.local:8480/insert/0/prometheus
+            - -evaluationInterval=15s
+            - -httpListenAddr=0.0.0.0:8080
+          volumeMounts:
+            - mountPath: /etc/ruler/
+              name: ruler
+              readOnly: true
+      volumes:
+        - configMap:
+            name: vmalert-config
+          name: ruler
