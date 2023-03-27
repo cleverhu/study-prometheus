@@ -7,10 +7,12 @@ metadata:
   labels:
     app: vmselect
 spec:
+  type: NodePort
   ports:
     - name: http
       port: 8481
       targetPort: http
+      nodePort: 30481
   selector:
     app: vmselect
 ---
