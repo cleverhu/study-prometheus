@@ -1,4 +1,18 @@
-# vm-grafana.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: victoria-metrics
+  namespace: monitor
+spec:
+  type: NodePort
+  ports:
+    - port: 8428
+      targetPort: 8428
+      nodePort: 32121
+  selector:
+    app: victoria-metrics
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
