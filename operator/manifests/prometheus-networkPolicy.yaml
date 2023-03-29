@@ -14,18 +14,18 @@ spec:
   - {}
   ingress:
   - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
+    # - podSelector:
+    #     matchLabels:
+    #       app.kubernetes.io/name: prometheus
     ports:
     - port: 9090
       protocol: TCP
     - port: 8080
       protocol: TCP
   - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus-adapter
+    # - podSelector:
+    #     matchLabels:
+    #       app.kubernetes.io/name: prometheus-adapter
     ports:
     - port: 9090
       protocol: TCP

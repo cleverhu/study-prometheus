@@ -1,0 +1,48 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/part-of: kube-prometheus
+  name: etcd
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: port
+    interval: 15s
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: etcd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: etcd
+spec:
+  type: ClusterIP
+  clusterIP: None # 一定要设置 clusterIP:None
+  ports:
+    - name: port
+      port: 2381
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: etcd
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: etcd
+subsets:
+  - addresses:
+      - ip: 10.130.59.18 # 指定etcd节点地址，如果是集群则继续向下添加
+        nodeName: k8s-master
+    ports:
+      - name: port
+        port: 2381
